@@ -457,5 +457,5 @@ if __name__ == "__main__":
     print("OrpheusDL Web UI")
     print(f"  OrpheusDL dir : {ORPHEUS_DIR}")
     print(f"  Settings file : {SETTINGS_FILE}")
-    print(f"  Open browser  : http://localhost:5000")
-    app.run(host="0.0.0.0", port=5000, debug=False, threaded=True)
+    print(f"  Open browser  : http://localhost:3000")
+    app.run(host="0.0.0.0", port=3000, debug=False, threaded=True)

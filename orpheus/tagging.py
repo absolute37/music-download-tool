@@ -334,13 +334,21 @@ def tag_file(file_path: str, image_path: str, track_info: TrackInfo, credits_lis
     # add OrpheusDL provenance comment/source tags (PR #2) - real track comments
     # below take precedence, so they are never overwritten
     if service_name:
+        # Avoid adding a visible provenance comment for TIDAL downloads since
+        # Serato DJ Pro surfaces it as "TIDAL OrpheusDL" in the comment field.
+        add_provenance_comment = True
+        try:
+            add_provenance_comment = str(service_name).strip().lower() != 'tidal'
+        except Exception:
+            add_provenance_comment = True
+
         provenance_comment = f'{service_name} OrpheusDL {today.strftime("%m/%d/%y")}'
         if container == ContainerEnum.m4a or container == ContainerEnum.mp4:
-            if not track_info.tags.comment:
+            if add_provenance_comment and not track_info.tags.comment:
                 tagger['\xa9cmt'] = [provenance_comment]
             tagger['----:com.apple.itunes:SOURCE'] = [service_name.encode()]
         elif container == ContainerEnum.mp3:
-            if not track_info.tags.comment:
+            if add_provenance_comment and not track_info.tags.comment:
                 tagger.tags._EasyID3__id3._DictProxy__dict['COMM'] = COMM(
                     encoding=3,
                     lang=u'eng',
@@ -349,7 +357,7 @@ def tag_file(file_path: str, image_path: str, track_info: TrackInfo, credits_lis
                 )
             tagger['source'] = service_name
         else:
-            if not track_info.tags.comment:
+            if add_provenance_comment and not track_info.tags.comment:
                 tagger['comment'] = provenance_comment
             tagger['source'] = service_name
 
